@@ -1,0 +1,76 @@
+import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import FloorMap from './FloorMap';
+
+const MapContainer = ({
+  floor,
+  layoutState,
+  isSearchOpen,
+  onRoomClick,
+  onMapEnter,
+  onMapLeave,
+  onRoomHover,
+}) => {
+
+  const springTransition = {
+    type: "spring",
+    stiffness: 120,
+    damping: 20,
+    mass: 1
+  };
+
+  const getXOffset = () => {
+    switch(layoutState) {
+      case 'DETAIL_LEFT': return '-22%';
+      case 'HOVER_LEFT': return '-15%';
+      default: return '0%';
+    }
+  };
+
+  return (
+    <motion.div
+      className="map-viewport"
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        position: 'absolute'
+      }}
+      initial={false}
+      animate={{
+        x: getXOffset(),
+        scale: isSearchOpen ? 0.95 : 1
+      }}
+      transition={springTransition}
+    >
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={floor}
+          initial={{ y: floor === 5 ? '100%' : '-100%', opacity: 0 }}
+          animate={{ y: '0%', opacity: 1 }}
+          exit={{ y: floor === 5 ? '-100%' : '100%', opacity: 0 }}
+          transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+          style={{
+            width: '60vw',
+            height: '70vh',
+            position: 'relative',
+            pointerEvents: 'auto'
+          }}
+        >
+          <FloorMap
+            floor={floor}
+            onMapEnter={onMapEnter}
+            onMapLeave={onMapLeave}
+            onRoomHover={onRoomHover}
+            onRoomClick={onRoomClick}
+          />
+        </motion.div>
+      </AnimatePresence>
+    </motion.div>
+  );
+};
+
+export default MapContainer;
